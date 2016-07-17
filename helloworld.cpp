@@ -29,7 +29,7 @@ HelloWorld::HelloWorld()
   // Sets the border width of the window.
   set_border_width(10);
   set_title("Visualizador de logs");
-  set_default_size(400, 400);
+  set_default_size(largura, altura);
 
   add_arquivo.set_label("Adicionar arquivo");
   remover_aba.set_label("Remover Aba");
@@ -73,7 +73,7 @@ HelloWorld::HelloWorld()
 
 
  //Add the Notebook pages:
- add_aba("Primeiro");
+ // add_aba("Primeiro");
 
  m_Notebook.signal_switch_page().connect(sigc::mem_fun(*this,
              &HelloWorld::on_notebook_switch_page) );
@@ -99,8 +99,10 @@ void HelloWorld::evento_botao_add_arquivo()
   std::string arquivo_selecionado = abrir_seletor_de_arquivos();
   if( arquivo_selecionado.size() > 0 ){
     std::cout << "File selected: " <<  arquivo_selecionado << std::endl;
+    vector<Glib::ustring> linhas = linhas_arquivo(arquivo_selecionado);
+    add_aba("teste", &linhas);
   }
-  
+
 }
 
 void HelloWorld::evento_botao_remover_aba()
@@ -123,19 +125,23 @@ void HelloWorld::on_notebook_switch_page(Gtk::Widget* /* page */, guint page_num
   //You can also use m_Notebook.get_current_page() to get this index.
 }
 
-void HelloWorld::add_aba(Glib::ustring titulo_da_aba)
+void HelloWorld::add_aba(Glib::ustring titulo_da_aba, vector<Glib::ustring>* linhas)
 {
   int indice_nova_aba = m_Notebook.get_n_pages();
 
-  vector<Glib::ustring> linhas;
-  for(int i=0; i<100; i++){
-    linhas.push_back("item ");
-  }
+  // if( linhas->empty() )
+  // {
+  //     // vector<Glib::ustring> linhas;
+  //     for(int i=0; i<100; i++){
+  //       linhas->push_back("item ");
+  //     }
+  // }
 
-  add_lista_em_aba(indice_nova_aba, linhas);
+  add_lista_em_aba(indice_nova_aba, *linhas);
   m_Notebook.append_page(scroll[indice_nova_aba], titulo_da_aba);
   lista.show_all();
   show_all_children();
+  m_Notebook.set_current_page(indice_nova_aba);
 }
 
 std::string HelloWorld::abrir_seletor_de_arquivos()
@@ -148,18 +154,17 @@ std::string HelloWorld::abrir_seletor_de_arquivos()
   dialog.add_button("_Open", Gtk::RESPONSE_OK);
 
   //Add filters, so that only certain file types can be selected:
-
-  auto filter_text = Gtk::FileFilter::create();
-  filter_text->set_name("Text files");
-  filter_text->add_mime_type("text/plain");
-  dialog.add_filter(filter_text);
-
-  auto filter_cpp = Gtk::FileFilter::create();
-  filter_cpp->set_name("C/C++ files");
-  filter_cpp->add_mime_type("text/x-c");
-  filter_cpp->add_mime_type("text/x-c++");
-  filter_cpp->add_mime_type("text/x-c-header");
-  dialog.add_filter(filter_cpp);
+  // auto filter_text = Gtk::FileFilter::create();
+  // filter_text->set_name("Text files");
+  // filter_text->add_mime_type("text/plain");
+  // dialog.add_filter(filter_text);
+  //
+  // auto filter_cpp = Gtk::FileFilter::create();
+  // filter_cpp->set_name("C/C++ files");
+  // filter_cpp->add_mime_type("text/x-c");
+  // filter_cpp->add_mime_type("text/x-c++");
+  // filter_cpp->add_mime_type("text/x-c-header");
+  // dialog.add_filter(filter_cpp);
 
   auto filter_any = Gtk::FileFilter::create();
   filter_any->set_name("Any files");
@@ -193,4 +198,16 @@ std::string HelloWorld::abrir_seletor_de_arquivos()
       }
   }
   return filename;
+}
+
+vector<Glib::ustring> HelloWorld::linhas_arquivo(std::string& arquivo)
+{
+    std::ifstream file(arquivo);
+    std::string str;
+    vector<Glib::ustring> linhas;
+    while (std::getline(file, str))
+    {
+      linhas.push_back(str);
+    }
+    return linhas;
 }

@@ -23,7 +23,9 @@
 // #include <gtkmm/window.h>
 #include <gtkmm.h>
 #include <iostream>
+#include <fstream>
 #include <vector>
+
 using namespace std;
 
 #define MAXIMO_ABAS 100
@@ -48,7 +50,8 @@ protected:
   Gtk::Button add_arquivo;
   Gtk::Button remover_aba;
 
-  // int numero_abas = 0;
+  int altura = 700;
+  int largura = 1000;
 
   //Child widgets:
   Gtk::Box m_VBox;
@@ -63,8 +66,9 @@ protected:
   Gtk::ButtonBox m_ButtonBox;
   Gtk::Button m_Button_Quit;
 
-  void add_aba(Glib::ustring);
+  void add_aba(Glib::ustring, vector<Glib::ustring>*);
   std::string abrir_seletor_de_arquivos();
+  vector<Glib::ustring> linhas_arquivo(std::string&);
 
   //---******************************************************---
   Gtk::TreeView treeview[MAXIMO_ABAS];
