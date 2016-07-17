@@ -96,11 +96,17 @@ void HelloWorld::evento_botao_add_arquivo()
   // add_aba("xip");
   std::cout << "Add um novo arquivo" << std::endl;
 
-  std::string arquivo_selecionado = abrir_seletor_de_arquivos();
-  if( arquivo_selecionado.size() > 0 ){
-    std::cout << "File selected: " <<  arquivo_selecionado << std::endl;
-    vector<Glib::ustring> linhas = linhas_arquivo(arquivo_selecionado);
-    add_aba("teste", &linhas);
+  abrir_seletor_de_arquivos();
+  if( (!caminho_completo_arquivo.empty()) && (!nome_arquivo.empty()) )
+  {
+    std::cout << "File selected: " <<  caminho_completo_arquivo << std::endl;
+    vector<Glib::ustring> linhas = linhas_arquivo(caminho_completo_arquivo);
+
+    int tam_max = 30;
+    if( nome_arquivo.size() > tam_max ){
+      nome_arquivo = nome_arquivo.substr(0,tam_max-3)+"...";
+    }
+    add_aba(nome_arquivo, &linhas);
   }
 
 }
@@ -144,7 +150,7 @@ void HelloWorld::add_aba(Glib::ustring titulo_da_aba, vector<Glib::ustring>* lin
   m_Notebook.set_current_page(indice_nova_aba);
 }
 
-std::string HelloWorld::abrir_seletor_de_arquivos()
+void HelloWorld::abrir_seletor_de_arquivos()
 {
   Gtk::FileChooserDialog dialog("Please choose a file", Gtk::FILE_CHOOSER_ACTION_OPEN);
   dialog.set_transient_for(*this);
@@ -182,8 +188,12 @@ std::string HelloWorld::abrir_seletor_de_arquivos()
       {
         std::cout << "Open clicked." << std::endl;
 
+        auto arq = dialog.get_file();
+        nome_arquivo = arq->get_basename();
+
         //Notice that this is a std::string, not a Glib::ustring.
         filename = dialog.get_filename();
+        caminho_completo_arquivo = filename;
         break;
       }
       case(Gtk::RESPONSE_CANCEL):
@@ -197,7 +207,6 @@ std::string HelloWorld::abrir_seletor_de_arquivos()
         break;
       }
   }
-  return filename;
 }
 
 vector<Glib::ustring> HelloWorld::linhas_arquivo(std::string& arquivo)

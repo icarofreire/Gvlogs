@@ -67,8 +67,11 @@ protected:
   Gtk::Button m_Button_Quit;
 
   void add_aba(Glib::ustring, vector<Glib::ustring>*);
-  std::string abrir_seletor_de_arquivos();
+  void abrir_seletor_de_arquivos();
   vector<Glib::ustring> linhas_arquivo(std::string&);
+
+  std::string nome_arquivo;
+  std::string caminho_completo_arquivo;
 
   //---******************************************************---
   Gtk::TreeView treeview[MAXIMO_ABAS];
