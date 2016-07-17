@@ -93,8 +93,14 @@ void HelloWorld::on_button_clicked()
 
 void HelloWorld::evento_botao_add_arquivo()
 {
-  add_aba("xip");
+  // add_aba("xip");
   std::cout << "Add um novo arquivo" << std::endl;
+
+  std::string arquivo_selecionado = abrir_seletor_de_arquivos();
+  if( arquivo_selecionado.size() > 0 ){
+    std::cout << "File selected: " <<  arquivo_selecionado << std::endl;
+  }
+  
 }
 
 void HelloWorld::evento_botao_remover_aba()
@@ -130,4 +136,61 @@ void HelloWorld::add_aba(Glib::ustring titulo_da_aba)
   m_Notebook.append_page(scroll[indice_nova_aba], titulo_da_aba);
   lista.show_all();
   show_all_children();
+}
+
+std::string HelloWorld::abrir_seletor_de_arquivos()
+{
+  Gtk::FileChooserDialog dialog("Please choose a file", Gtk::FILE_CHOOSER_ACTION_OPEN);
+  dialog.set_transient_for(*this);
+
+  //Add response buttons the the dialog:
+  dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+  dialog.add_button("_Open", Gtk::RESPONSE_OK);
+
+  //Add filters, so that only certain file types can be selected:
+
+  auto filter_text = Gtk::FileFilter::create();
+  filter_text->set_name("Text files");
+  filter_text->add_mime_type("text/plain");
+  dialog.add_filter(filter_text);
+
+  auto filter_cpp = Gtk::FileFilter::create();
+  filter_cpp->set_name("C/C++ files");
+  filter_cpp->add_mime_type("text/x-c");
+  filter_cpp->add_mime_type("text/x-c++");
+  filter_cpp->add_mime_type("text/x-c-header");
+  dialog.add_filter(filter_cpp);
+
+  auto filter_any = Gtk::FileFilter::create();
+  filter_any->set_name("Any files");
+  filter_any->add_pattern("*");
+  dialog.add_filter(filter_any);
+
+  //Show the dialog and wait for a user response:
+  int result = dialog.run();
+
+  //Handle the response:
+  std::string filename = "";
+  switch(result)
+  {
+      case(Gtk::RESPONSE_OK):
+      {
+        std::cout << "Open clicked." << std::endl;
+
+        //Notice that this is a std::string, not a Glib::ustring.
+        filename = dialog.get_filename();
+        break;
+      }
+      case(Gtk::RESPONSE_CANCEL):
+      {
+        std::cout << "Cancel clicked." << std::endl;
+        break;
+      }
+      default:
+      {
+        std::cout << "Unexpected button clicked." << std::endl;
+        break;
+      }
+  }
+  return filename;
 }
