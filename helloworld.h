@@ -39,10 +39,9 @@ public:
 
 protected:
   //Signal handlers:
-  void on_button_clicked();
   void evento_botao_add_arquivo();
   void evento_botao_remover_aba();
-  void on_notebook_switch_page(Gtk::Widget* page, guint page_num);
+  void evento_trocou_aba(Gtk::Widget* page, guint page_num);
   void on_button_quit();
 
   //Member widgets:
@@ -50,6 +49,7 @@ protected:
   Gtk::Button add_arquivo;
   Gtk::Button remover_aba;
 
+  Glib::ustring titulo_primeira_aba = "File.log";
   int altura = 700;
   int largura = 1000;
 
@@ -107,9 +107,7 @@ protected:
     treeview[ indice_aba ].set_model(refTreeModel);
     treeview[ indice_aba ].append_column("Cnt", columns.col_cnt);
     treeview[ indice_aba ].append_column("Text", columns.col_text);
-    // add_lista("teste 1");
-    // add_lista("teste 2");
-    // add_lista("teste 3");
+
     for(vector<Glib::ustring>::iterator i = linhas.begin(); i != linhas.end(); i++){
         add_lista( *i );
     }

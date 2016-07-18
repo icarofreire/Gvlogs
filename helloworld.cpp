@@ -24,7 +24,7 @@ using namespace std;
 HelloWorld::HelloWorld()
 : m_button("Hello World"),   // creates a new button with label "Hello World".
   m_VBox(Gtk::ORIENTATION_VERTICAL),
-  m_Button_Quit("Fechar")
+  m_Button_Quit("Sair")
 {
   // Sets the border width of the window.
   set_border_width(10);
@@ -33,23 +33,6 @@ HelloWorld::HelloWorld()
 
   add_arquivo.set_label("Adicionar arquivo");
   remover_aba.set_label("Remover Aba");
-
-
-  // --
-  // Gtk::TreeView *treeview = Gtk::manage(new Gtk::TreeView);
-  //   treeview.set_hexpand(true);
-  //   treeview.set_vexpand(true);
-  //
-  // refTreeModel = Gtk::ListStore::create(columns);
-  //   treeview.set_model(refTreeModel);
-  //   treeview.append_column("Cnt", columns.col_cnt);
-  //   treeview.append_column("Text", columns.col_text);
-  //   add_lista("teste 1");
-  //   add_lista("teste 2");
-  // add_lista_em_aba();
-  // add_lista_em_aba();
-  // --
-
 
   add(m_VBox);
 
@@ -71,12 +54,12 @@ HelloWorld::HelloWorld()
  remover_aba.signal_clicked().connect(sigc::mem_fun(*this,
              &HelloWorld::evento_botao_remover_aba) );
 
-
- //Add the Notebook pages:
- // add_aba("Primeiro");
-
  m_Notebook.signal_switch_page().connect(sigc::mem_fun(*this,
-             &HelloWorld::on_notebook_switch_page) );
+             &HelloWorld::evento_trocou_aba) );
+
+ vector<Glib::ustring> l__;
+ add_aba(titulo_primeira_aba, &l__);
+
 
  show_all_children();
 
@@ -86,20 +69,19 @@ HelloWorld::~HelloWorld()
 {
 }
 
-void HelloWorld::on_button_clicked()
+void HelloWorld::evento_trocou_aba(Gtk::Widget* page, guint page_num)
 {
-  std::cout << "Hello World" << std::endl;
+  remover_aba.set_label("Remover '" + m_Notebook.get_tab_label_text(*page) + "'");
 }
 
 void HelloWorld::evento_botao_add_arquivo()
 {
-  // add_aba("xip");
-  std::cout << "Add um novo arquivo" << std::endl;
+  // std::cout << "Add um novo arquivo" << std::endl;
 
   abrir_seletor_de_arquivos();
   if( (!caminho_completo_arquivo.empty()) && (!nome_arquivo.empty()) )
   {
-    std::cout << "File selected: " <<  caminho_completo_arquivo << std::endl;
+    // std::cout << "File selected: " <<  caminho_completo_arquivo << std::endl;
     vector<Glib::ustring> linhas = linhas_arquivo(caminho_completo_arquivo);
 
     int tam_max = 30;
@@ -125,25 +107,15 @@ void HelloWorld::on_button_quit()
   hide();
 }
 
-void HelloWorld::on_notebook_switch_page(Gtk::Widget* /* page */, guint page_num)
-{
-  std::cout << "Switched to tab with index " << page_num << std::endl;
-  //You can also use m_Notebook.get_current_page() to get this index.
-}
-
 void HelloWorld::add_aba(Glib::ustring titulo_da_aba, vector<Glib::ustring>* linhas)
 {
   int indice_nova_aba = m_Notebook.get_n_pages();
-
-  // if( linhas->empty() )
-  // {
-  //     // vector<Glib::ustring> linhas;
-  //     for(int i=0; i<100; i++){
-  //       linhas->push_back("item ");
-  //     }
-  // }
-
   add_lista_em_aba(indice_nova_aba, *linhas);
+
+  if( (m_Notebook.get_tab_label_text(scroll[0]) == titulo_primeira_aba) && (m_Notebook.get_n_pages() == 1) ){
+      m_Notebook.remove_page(0);
+  }
+
   m_Notebook.append_page(scroll[indice_nova_aba], titulo_da_aba);
   lista.show_all();
   show_all_children();
@@ -158,19 +130,6 @@ void HelloWorld::abrir_seletor_de_arquivos()
   //Add response buttons the the dialog:
   dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
   dialog.add_button("_Open", Gtk::RESPONSE_OK);
-
-  //Add filters, so that only certain file types can be selected:
-  // auto filter_text = Gtk::FileFilter::create();
-  // filter_text->set_name("Text files");
-  // filter_text->add_mime_type("text/plain");
-  // dialog.add_filter(filter_text);
-  //
-  // auto filter_cpp = Gtk::FileFilter::create();
-  // filter_cpp->set_name("C/C++ files");
-  // filter_cpp->add_mime_type("text/x-c");
-  // filter_cpp->add_mime_type("text/x-c++");
-  // filter_cpp->add_mime_type("text/x-c-header");
-  // dialog.add_filter(filter_cpp);
 
   auto filter_any = Gtk::FileFilter::create();
   filter_any->set_name("Any files");
